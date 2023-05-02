@@ -5,7 +5,7 @@ import { Button } from "antd";
 import { ColumnsType } from "antd/es/table";
 import DiscountInput from "../Components/DiscountButton";
 import { EditOutlined } from "@ant-design/icons";
-import ProductPickerModal from "./ProduPickerModal";
+import ProductPickerModal from "./ProdutPickerModal";
 
 interface VaraintsTableProps {
   record: Product;
@@ -20,12 +20,12 @@ const defaultProdut: Product = {
 const VaraintsTable: FC<VaraintsTableProps> = ({ record, setDataSource }) => {
   const [data, setData] = useState(record.variants);
 
-  const deleteVariant = (variant:Variant)=>{
-    setData((prev)=>{
-      prev = prev.filter((val)=>val.id!=variant.id);
-      return prev?.length>0 ? prev:[] 
-    })
-  }
+  const deleteVariant = (variant: Variant) => {
+    setData((prev) => {
+      prev = prev.filter((val) => val.id != variant.id);
+      return prev?.length > 0 ? prev : [];
+    });
+  };
   const varaintColumn: ColumnsType<Variant> = [
     {
       key: "sort",
@@ -36,14 +36,35 @@ const VaraintsTable: FC<VaraintsTableProps> = ({ record, setDataSource }) => {
       render(variantValue, variantRecord, variantIndex) {
         const discount = variantRecord.discount;
         return (
-          <div style={{ display: "flex", flexDirection: "row" }}>
-            <div>{variantValue}</div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                minWidth: 185,
+                border: "1px solid #00000012",
+                borderRadius: 30,
+                borderColor: "#00000012",
+                alignItems: "center",
+                padding: 10,
+                marginRight: 12,
+              }}
+            >
+              {variantValue}
+            </div>
             {discount ? (
               <div>
                 <DiscountInput
                   discount={discount}
                   onValueChange={(val) => (variantRecord.discount.value = val)}
                   onTypeChange={(type) => (variantRecord.discount.type = type)}
+                  valueStyle={{ borderRadius: 30 }}
+                  typeStyle={{ borderRadius: 30 }}
                 />
               </div>
             ) : (
@@ -62,7 +83,13 @@ const VaraintsTable: FC<VaraintsTableProps> = ({ record, setDataSource }) => {
                 Add Discount
               </Button>
             )}
-            <Button onClick={()=>deleteVariant(variantRecord)}>X</Button>
+            <Button
+              type="text"
+              onClick={() => deleteVariant(variantRecord)}
+              style={{ color: "#00000066" }}
+            >
+              X
+            </Button>
           </div>
         );
       },
@@ -70,21 +97,21 @@ const VaraintsTable: FC<VaraintsTableProps> = ({ record, setDataSource }) => {
   ];
 
   useEffect(() => {
-    if(data.length==0){
-      setDataSource((prevData)=>{
-         prevData = prevData.filter((dataVal)=>dataVal.id!=record.id)
-         return prevData?.length>0?prevData:[defaultProdut]
-      })  
-    }else{
-    setDataSource((prev) => {
-      return prev.map((val) => {
-        if (val.id == record.id) {
-            val.variants = [...data];
-        }
-        return val;
+    if (data.length == 0) {
+      setDataSource((prevData) => {
+        prevData = prevData.filter((dataVal) => dataVal.id != record.id);
+        return prevData?.length > 0 ? prevData : [defaultProdut];
       });
-    });
-  }
+    } else {
+      setDataSource((prev) => {
+        return prev.map((val) => {
+          if (val.id == record.id) {
+            val.variants = [...data];
+          }
+          return val;
+        });
+      });
+    }
   }, [data]);
 
   return (
@@ -108,31 +135,30 @@ const DiscountSection: FC<DiscountSectionProps> = ({
   const discount = record.discount;
   const handleValueChange = (value: number) => {
     if (record.discount) record.discount.value = value;
-    record.variants.forEach((val)=>{
-      if(record.discount){
-        val.discount.value=value;
+    record.variants.forEach((val) => {
+      if (record.discount) {
+        val.discount.value = value;
       }
-    })
+    });
   };
   const handleTypeChange = (type: DiscountType) => {
     if (record.discount) record.discount.type = type;
-    record.variants.forEach((val)=>{
-      if(record.discount){
-        val.discount.type=type;
+    record.variants.forEach((val) => {
+      if (record.discount) {
+        val.discount.type = type;
       }
-    })
-
+    });
   };
 
-  const deleteProduct = ()=>{
-    setDataSource((prevData)=>{
-      prevData = prevData.filter((dataVal)=>dataVal.id!=record.id)
-      return prevData
-   })
-  }
+  const deleteProduct = () => {
+    setDataSource((prevData) => {
+      prevData = prevData.filter((dataVal) => dataVal.id != record.id);
+      return prevData;
+    });
+  };
 
   return (
-    <div>
+    <div style={{ display: "flex" }}>
       {discount ? (
         <DiscountInput
           discount={discount}
@@ -141,14 +167,15 @@ const DiscountSection: FC<DiscountSectionProps> = ({
         />
       ) : (
         <Button
+          type="primary"
           onClick={() => {
             setDataSource((prev) => {
               return prev.map((val) => {
                 if (val.id == record.id) {
                   val.discount = { type: "percentage", value: 0 };
-                  val.variants.forEach((varaint)=>{
-                    varaint.discount={type:"percentage",value:0};
-                  })
+                  val.variants.forEach((varaint) => {
+                    varaint.discount = { type: "percentage", value: 0 };
+                  });
                 }
                 return val;
               });
@@ -158,7 +185,15 @@ const DiscountSection: FC<DiscountSectionProps> = ({
           Add Discount
         </Button>
       )}
-       {record.id > 0 && <Button onClick={()=>deleteProduct()}>X</Button> }
+      {record.id > 0 && (
+        <Button
+          type="text"
+          onClick={() => deleteProduct()}
+          style={{ color: "#00000066" }}
+        >
+          X
+        </Button>
+      )}
     </div>
   );
 };
@@ -168,13 +203,20 @@ const Varaints: FC<DiscountSectionProps> = ({ record, setDataSource }) => {
   return (
     <div>
       {record.id > 0 && (
-        <div>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Button
             onClick={() => {
               setShow((prev) => !prev);
             }}
+            type="text"
+            style={{
+              color: "#006EFF",
+            }}
           >
-            {`${!show ? "show" : "hide"} variants`}
+            <span style={{ marginRight: 2 }}>
+              <u>{`${!show ? "show" : "hide"} variants `}</u>
+            </span>
+            <span style={{ rotate: `${show ? 90 : -90}deg` }}>{">"}</span>
           </Button>
         </div>
       )}
@@ -187,12 +229,11 @@ const Varaints: FC<DiscountSectionProps> = ({ record, setDataSource }) => {
   );
 };
 const Home = () => {
-  
   const [dataSource, setDataSource] = useState<Product[]>([defaultProdut]);
 
   const addIndex = useRef<number>(-1);
   const showProducts = (index: number) => {
-    addIndex.current=index;
+    addIndex.current = index;
     setSelectProducts(true);
   };
   const [selectProducts, setSelectProducts] = useState<boolean>(false);
@@ -208,9 +249,27 @@ const Home = () => {
         return (
           <div>
             <div style={{ display: "flex", flexDirection: "row" }}>
-              <Button onClick={() => showProducts(record.id)}>
-                {value ? value : "select product"}
-                <EditOutlined />
+              <Button
+                onClick={() => showProducts(record.id)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginRight: 15,
+                  borderColor: "#00000012",
+                }}
+              >
+                <div style={{ width: 215, display: "flex" }}>
+                  {value ? (
+                    <span
+                      style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                    >
+                      {value}
+                    </span>
+                  ) : (
+                    <span style={{ color: "#00000080" }}>Select Product</span>
+                  )}
+                </div>
+                <EditOutlined style={{ color: "#00000033" }} />
               </Button>
               <DiscountSection record={record} setDataSource={setDataSource} />
             </div>
@@ -222,17 +281,41 @@ const Home = () => {
   ];
 
   return (
-    <div>
-      Products
-      <DragTable
-        columns={columns}
-        dataSource={dataSource}
-        setDataSource={setDataSource}
-      />
-
-      <Button onClick={() => showProducts(-1)}>
-        Add Product
-      </Button>
+    <div
+      style={{
+        display: "flex",
+        flex: 1,
+        alignItems: "center",
+        flexDirection: "column",
+      }}
+    >
+      <div style={{ position: "relative" }}>
+        {dataSource && dataSource.length > 0 ? (
+          <div>
+            Add Products
+            <DragTable
+              columns={columns}
+              dataSource={dataSource}
+              setDataSource={setDataSource}
+            />
+          </div>
+        ) : (
+          <div>No Products</div>
+        )}
+        <div style={{ position: "absolute", bottom: -40, right: 0 }}>
+          <Button
+            onClick={() => showProducts(-1)}
+            style={{
+              color: "#008060",
+              borderWidth: 2,
+              borderColor: "#008060",
+              borderRadius: 4,
+            }}
+          >
+            Add Product
+          </Button>
+        </div>
+      </div>
       <ProductPickerModal
         showModal={selectProducts}
         setModal={setSelectProducts}

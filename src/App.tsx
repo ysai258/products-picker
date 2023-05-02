@@ -1,13 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import ProductsList from './Screens/Home';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import ProductsList from "./Screens/Home";
+import { ConfigProvider } from "antd";
 
 function App() {
   return (
-    <div className="App">
-      <ProductsList/>
-    </div>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: "#008060",
+          borderRadius: 4,
+          boxShadow: "none",
+          colorBgTextHover: "",
+        },
+      }}
+    >
+      <ProductsList />
+    </ConfigProvider>
   );
 }
 

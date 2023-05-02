@@ -9,8 +9,7 @@ export interface Product {
   title: string;
   variants: Variant[];
   image: Image;
-  discount?:Discount ;
-  // showVariants?:boolean ;
+  discount?: Discount;
 }
 
 export interface Variant {
@@ -18,7 +17,8 @@ export interface Variant {
   product_id: number;
   title: string;
   price: string;
-  discount:Discount;
+  discount: Discount;
+  inventory_quantity?: number;
 }
 
 export interface Image {

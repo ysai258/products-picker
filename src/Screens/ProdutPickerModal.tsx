@@ -1,8 +1,8 @@
-import { Modal, Button, TreeProps, Input, Spin } from "antd";
+import { Modal, Button, TreeProps, Input } from "antd";
 import { FC, Key, useEffect, useState } from "react";
 import Tree, { DataNode } from "antd/es/tree";
 import { Product } from "../Types/Types";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
 const BASE_URL = "https://stageapibc.monkcommerce.app/admin/shop";
 interface Props {
   showModal: boolean;
@@ -38,29 +38,30 @@ const ProductPickerModal: FC<Props> = ({
       }
     });
 
-    const filteredProducts: Product[] = productData.filter((product) => {
-      const requiredVariants = requiredProduts[product.id];     
-      if (requiredVariants) {
-        console.log("yash inside if before",product.variants)
-        const filteredVariants = product.variants.filter((variant) =>
-          requiredVariants.includes(variant.id)
-        );
-        return filteredVariants.length > 0;
-      }
-      return false;
-    }).map(product => ({
+    const filteredProducts: Product[] = productData
+      .filter((product) => {
+        const requiredVariants = requiredProduts[product.id];
+        if (requiredVariants) {
+          const filteredVariants = product.variants.filter((variant) =>
+            requiredVariants.includes(variant.id)
+          );
+          return filteredVariants.length > 0;
+        }
+        return false;
+      })
+      .map((product) => ({
         ...product,
-        variants: product.variants.filter(variant =>
+        variants: product.variants.filter((variant) =>
           requiredProduts[product.id]?.includes(variant.id)
-        )
+        ),
       }));
 
     setData((prev) => {
       const temp: Product[] = [];
-      let flag=true;
+      let flag = true;
       prev.map((prevProduct) => {
         if (prevProduct.id == replaceId) {
-            flag=false;
+          flag = false;
           filteredProducts.map((val) => temp.push(val));
         } else {
           temp.push(prevProduct);
@@ -69,6 +70,7 @@ const ProductPickerModal: FC<Props> = ({
       if (flag) {
         filteredProducts.map((val) => temp.push(val));
       }
+      temp.forEach((v, ind) => (v.id = ind + 1));
       return temp;
     });
 
@@ -97,23 +99,51 @@ const ProductPickerModal: FC<Props> = ({
         data?.map((val: Product) => {
           const tempNode: DataNode = {
             title: (
-              <div style={{display:"flex",alignItems:"center"}}>
-                <img src={val?.image?.src} height={50} width={50} />
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  backgroundColor: "yellowgreen",
+                  width: "100%",
+                }}
+              >
+                <img
+                  src={val?.image?.src}
+                  height={36}
+                  width={36}
+                  style={{ borderRadius: 4, marginRight: 14 }}
+                />
                 {val.title}
               </div>
             ),
+            style: {
+              display: "flex",
+              alignItems: "center",
+              backgroundColor: "blue",
+              padding: 10,
+              width: "100%",
+            },
             key: `${val.id}`,
             children: val.variants.map((variant) => {
               return {
                 key: `${val.id}-${variant.id}`,
+                style: { backgroundColor: "green", width: "100%", padding: 5 },
                 title: (
-                  <div>
-                    <div>
-                    {variant.title}
-                    </div>
-                    <div>
-                    ${variant.price}
-                    </div>
+                  <div
+                    style={{
+                      backgroundColor: "red",
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <span>{variant.title}</span>
+                    <span>
+                      {`${
+                        variant.inventory_quantity
+                          ? variant.inventory_quantity
+                          : 0
+                      } available $${variant.price}`}
+                    </span>
                   </div>
                 ),
               };
@@ -132,8 +162,10 @@ const ProductPickerModal: FC<Props> = ({
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    if (showModal) {
+      fetchProducts();
+    }
+  }, [showModal]);
 
   useEffect(() => {
     const getData = setTimeout(() => {
@@ -170,14 +202,15 @@ const ProductPickerModal: FC<Props> = ({
           onChange={(e) => setSearch(e.target.value)}
         />
         {loading ? (
-          <Spin />
+          <LoadingOutlined />
         ) : (
-          <div>
+          <div className="productsTree">
             {treeData && treeData?.length > 0 ? (
               <Tree
                 checkable={true}
                 selectable={false}
                 defaultExpandAll={true}
+                autoExpandParent={true}
                 onCheck={onCheck}
                 treeData={treeData}
                 height={350}

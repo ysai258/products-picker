@@ -1,4 +1,3 @@
-import { MenuOutlined } from "@ant-design/icons";
 import type { DragEndEvent } from "@dnd-kit/core";
 import { DndContext } from "@dnd-kit/core";
 import {
@@ -44,11 +43,19 @@ const Row = ({ children, ...props }: RowProps) => {
         if ((child as React.ReactElement).key === "sort") {
           return React.cloneElement(child as React.ReactElement, {
             children: (
-              <MenuOutlined
+              <div
                 ref={setActivatorNodeRef}
-                style={{ touchAction: "none", cursor: "move" }}
+                style={{
+                  touchAction: "none",
+                  cursor: isDragging ? "grabbing" : "grab",
+                }}
                 {...listeners}
-              />
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <span style={{ fontSize: "18px", lineHeight: 1 }}>⋮</span>
+                  <span style={{ fontSize: "18px", lineHeight: 1 }}>⋮</span>
+                </div>
+              </div>
             ),
           });
         }
@@ -63,7 +70,6 @@ interface Props<T> {
   dataSource: T[];
   setDataSource: React.Dispatch<React.SetStateAction<T[]>>;
 }
-
 
 const DragTable: FC<Props<any>> = ({ columns, dataSource, setDataSource }) => {
   const onDragEnd = ({ active, over }: DragEndEvent) => {
