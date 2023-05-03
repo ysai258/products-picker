@@ -248,12 +248,20 @@ const Home = () => {
       render(value, record, index) {
         return (
           <div>
-            <div style={{ display: "flex", flexDirection: "row" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              {index + 1}.
               <Button
                 onClick={() => showProducts(record.id)}
                 style={{
                   display: "flex",
                   alignItems: "center",
+                  marginLeft: 8,
                   marginRight: 15,
                   borderColor: "#00000012",
                 }}

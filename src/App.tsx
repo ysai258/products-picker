@@ -13,6 +13,7 @@ function App() {
           borderRadius: 4,
           boxShadow: "none",
           colorBgTextHover: "",
+          colorText: "#000000E5",
         },
       }}
     >

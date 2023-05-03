@@ -17,27 +17,31 @@ const ProductPickerModal: FC<Props> = ({
   setData,
   replaceId,
 }) => {
-  const handleOk = () => {
-    interface RequiredProducts {
-      [productId: number]: number[];
-    }
+  interface RequiredProducts {
+    [productId: number]: number[];
+  }
 
-    const requiredProduts: RequiredProducts = {};
+  const getCheckedProducts = () => {
+    const selectedProducst: RequiredProducts = {};
     checkedKeys.map((key) => {
       key = key.toString();
       if (key.includes("-")) {
         const [productId, variantId] = key.split("-").map(Number);
-        if (requiredProduts[productId]) {
-          requiredProduts[productId] = [
-            ...requiredProduts[productId],
+        if (selectedProducst[productId]) {
+          selectedProducst[productId] = [
+            ...selectedProducst[productId],
             variantId,
           ];
         } else {
-          requiredProduts[productId] = [variantId];
+          selectedProducst[productId] = [variantId];
         }
       }
     });
+    return selectedProducst;
+  };
 
+  const handleOk = () => {
+    const requiredProduts = getCheckedProducts();
     const filteredProducts: Product[] = productData
       .filter((product) => {
         const requiredVariants = requiredProduts[product.id];
@@ -103,8 +107,7 @@ const ProductPickerModal: FC<Props> = ({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  backgroundColor: "yellowgreen",
-                  width: "100%",
+                  padding: "10px 0",
                 }}
               >
                 <img
@@ -117,33 +120,36 @@ const ProductPickerModal: FC<Props> = ({
               </div>
             ),
             style: {
-              display: "flex",
-              alignItems: "center",
-              backgroundColor: "blue",
-              padding: 10,
               width: "100%",
+              padding: "5px 0",
+              borderTop: "1px solid #0000001A",
             },
             key: `${val.id}`,
             children: val.variants.map((variant) => {
               return {
                 key: `${val.id}-${variant.id}`,
-                style: { backgroundColor: "green", width: "100%", padding: 5 },
+                style: {
+                  width: "100%",
+                  borderTop: "1px solid #0000001A",
+                  padding: "5px 0",
+                },
                 title: (
                   <div
                     style={{
-                      backgroundColor: "red",
                       display: "flex",
                       flexDirection: "row",
+                      justifyContent: "space-between",
+                      padding: "10px 0",
                     }}
                   >
-                    <span>{variant.title}</span>
-                    <span>
+                    <div>{variant.title}</div>
+                    <div>
                       {`${
                         variant.inventory_quantity
                           ? variant.inventory_quantity
                           : 0
                       } available $${variant.price}`}
-                    </span>
+                    </div>
                   </div>
                 ),
               };
@@ -178,21 +184,39 @@ const ProductPickerModal: FC<Props> = ({
     cKeys = cKeys as Key[];
     setCheckedKeys(cKeys);
   };
+  const resetModal = () => {
+    setCheckedKeys([]);
+  };
   return (
     <Modal
+      afterClose={resetModal}
       destroyOnClose={true}
       title="Select Products"
       open={showModal}
       onOk={handleOk}
       onCancel={handleCancel}
-      footer={[
-        <Button key="back" onClick={handleCancel}>
-          Cancel
-        </Button>,
-        <Button key="submit" type="primary" onClick={handleOk}>
-          Add
-        </Button>,
-      ]}
+      footer={
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            {Object.keys(getCheckedProducts()).length > 0 &&
+              `${Object.keys(getCheckedProducts()).length} product selected`}
+          </div>
+          <div>
+            <Button key="back" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button key="submit" type="primary" onClick={handleOk}>
+              Add
+            </Button>
+          </div>
+        </div>
+      }
     >
       <div>
         <Input

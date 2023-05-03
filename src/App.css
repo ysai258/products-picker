@@ -5,3 +5,10 @@
 .ant-table-tbody tr.ant-table-row:hover td {
   background: none !important;
 }
+.ant-tree-node-content-wrapper.ant-tree-node-content-wrapper-normal,
+.ant-tree-node-content-wrapper.ant-tree-node-content-wrapper-open {
+  width: 100% !important;
+}
+.ant-tree .ant-tree-checkbox {
+  align-self: center;
+}
