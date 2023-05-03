@@ -1,5 +1,5 @@
 import { Modal, Button, TreeProps, Input } from "antd";
-import { FC, Key, useEffect, useState } from "react";
+import React, { FC, Key, useEffect, useRef, useState } from "react";
 import Tree, { DataNode } from "antd/es/tree";
 import { Product } from "../Types/Types";
 import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
@@ -88,19 +88,27 @@ const ProductPickerModal: FC<Props> = ({
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<Key[]>([]);
   const [search, setSearch] = useState<string>("");
+  const pageNumber = useRef(1);
+  const goToNext = useRef(true);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const fetchProducts = async (search: string = "") => {
+  const fetchProducts = async (search: string = "", page: number = 1) => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${BASE_URL}/product?search=${search}&page=1`
+        `${BASE_URL}/product?search=${search}&page=${page}`
       );
       const data = await response.json();
-      const tempArr: DataNode[] = [];
-
-      setProductData(
-        data?.map((val: Product) => {
+      let tempArr: DataNode[] = [];
+      if (page > 1) {
+        tempArr = [...treeData];
+      } else {
+        pageNumber.current = 1;
+        goToNext.current = true;
+        setCheckedKeys([]);
+      }
+      if (data) {
+        data?.forEach((val: Product) => {
           const tempNode: DataNode = {
             title: (
               <div
@@ -156,11 +164,17 @@ const ProductPickerModal: FC<Props> = ({
             }),
           };
           tempArr.push(tempNode);
-          return val;
-        })
-      );
-
-      setTreeData(tempArr);
+        });
+        setProductData((prevData) => {
+          if (page > 1) {
+            return [...prevData, ...data];
+          }
+          return data;
+        });
+        setTreeData(tempArr);
+      } else {
+        goToNext.current = false;
+      }
     } catch (error) {
       console.log("error while fetch", error);
     }
@@ -169,16 +183,12 @@ const ProductPickerModal: FC<Props> = ({
 
   useEffect(() => {
     if (showModal) {
-      fetchProducts();
+      const getData = setTimeout(() => {
+        fetchProducts(search);
+      }, 400);
+      return () => clearTimeout(getData);
     }
-  }, [showModal]);
-
-  useEffect(() => {
-    const getData = setTimeout(() => {
-      fetchProducts(search);
-    }, 400);
-    return () => clearTimeout(getData);
-  }, [search]);
+  }, [search, showModal]);
 
   const onCheck: TreeProps["onCheck"] = (cKeys, info) => {
     cKeys = cKeys as Key[];
@@ -186,7 +196,11 @@ const ProductPickerModal: FC<Props> = ({
   };
   const resetModal = () => {
     setCheckedKeys([]);
+    setSearch("");
+    pageNumber.current = 1;
+    goToNext.current = true;
   };
+  console.log(checkedKeys);
   return (
     <Modal
       afterClose={resetModal}
@@ -232,7 +246,7 @@ const ProductPickerModal: FC<Props> = ({
           prefix={<SearchOutlined />}
           onChange={(e) => setSearch(e.target.value)}
         />
-        {loading ? (
+        {loading && pageNumber.current == 1 ? (
           <div
             style={{ display: "flex", padding: 20, justifyContent: "center" }}
           >
@@ -241,15 +255,43 @@ const ProductPickerModal: FC<Props> = ({
         ) : (
           <div className="productsTree">
             {treeData && treeData?.length > 0 ? (
-              <Tree
-                checkable={true}
-                selectable={false}
-                defaultExpandAll={true}
-                autoExpandParent={true}
-                onCheck={onCheck}
-                treeData={treeData}
-                height={350}
-              />
+              <div>
+                <Tree
+                  checkable={true}
+                  selectable={false}
+                  expandedKeys={treeData.map((val) => val.key)}
+                  checkedKeys={checkedKeys}
+                  autoExpandParent={true}
+                  onCheck={onCheck}
+                  treeData={treeData}
+                  height={350}
+                  onScroll={(event) => {
+                    const { currentTarget } = event;
+                    const { scrollTop, scrollHeight, clientHeight } =
+                      currentTarget;
+
+                    if (Math.ceil(scrollTop + clientHeight) == scrollHeight) {
+                      if (goToNext.current) {
+                        pageNumber.current += 1;
+                        fetchProducts(search, pageNumber.current);
+                      }
+                    }
+                  }}
+                />
+                {loading && pageNumber.current != 1 && (
+                  <div
+                    style={{
+                      display: "flex",
+                      padding: 20,
+                      justifyContent: "center",
+                    }}
+                  >
+                    <LoadingOutlined
+                      style={{ fontSize: 50, color: "#008060" }}
+                    />
+                  </div>
+                )}
+              </div>
             ) : (
               <div>No Products</div>
             )}
