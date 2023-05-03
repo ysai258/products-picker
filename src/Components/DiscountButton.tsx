@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useState } from "react";
+import { CSSProperties, FC, useEffect, useState } from "react";
 import { Discount, DiscountType } from "../Types/Types";
 import { Input, Select } from "antd";
 
@@ -18,6 +18,11 @@ const DiscountInput: FC<Props> = ({
 }) => {
   const [value, setValue] = useState(discount.value);
   const [type, setType] = useState(discount.type);
+
+  useEffect(() => {
+    setValue(discount.value);
+    setType(discount.type);
+  }, [discount]);
 
   const options = [
     {

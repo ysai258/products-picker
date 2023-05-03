@@ -141,19 +141,37 @@ const DiscountSection: FC<DiscountSectionProps> = ({
 }) => {
   const discount = record.discount;
   const handleValueChange = (value: number) => {
-    if (record.discount) record.discount.value = value;
-    record.variants.forEach((val) => {
-      if (record.discount) {
-        val.discount = { ...record.discount };
-      }
+    setDataSource((prev) => {
+      return prev.map((val) => {
+        if (val.id == record.id) {
+          if (val.discount) {
+            val.discount.value = value;
+            val.variants.forEach((varaint) => {
+              if (val.discount) {
+                varaint.discount = { ...val.discount };
+              }
+            });
+          }
+        }
+        return val;
+      });
     });
   };
   const handleTypeChange = (type: DiscountType) => {
-    if (record.discount) record.discount.type = type;
-    record.variants.forEach((val) => {
-      if (record.discount) {
-        val.discount = { ...record.discount };
-      }
+    setDataSource((prev) => {
+      return prev.map((val) => {
+        if (val.id == record.id) {
+          if (val.discount) {
+            val.discount.type = type;
+            val.variants.forEach((varaint) => {
+              if (val.discount) {
+                varaint.discount = { ...val.discount };
+              }
+            });
+          }
+        }
+        return val;
+      });
     });
   };
 
