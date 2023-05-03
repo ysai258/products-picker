@@ -274,7 +274,9 @@ const Home = () => {
       dataIndex: "title",
       render(value, record, index) {
         return (
-          <div style={{ borderBottom: "1px solid #0000001A" }}>
+          <div
+            style={{ borderBottom: record.id > 0 ? "1px solid #0000001A" : "" }}
+          >
             <div
               style={{
                 display: "flex",

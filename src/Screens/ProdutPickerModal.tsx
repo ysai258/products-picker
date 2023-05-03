@@ -201,6 +201,8 @@ const ProductPickerModal: FC<Props> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            borderTop: "1px solid #0000001A",
+            paddingTop: 10,
           }}
         >
           <div>
@@ -211,7 +213,12 @@ const ProductPickerModal: FC<Props> = ({
             <Button key="back" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button key="submit" type="primary" onClick={handleOk}>
+            <Button
+              key="submit"
+              type="primary"
+              onClick={handleOk}
+              disabled={Object.keys(getCheckedProducts()).length == 0}
+            >
               Add
             </Button>
           </div>
@@ -226,7 +233,11 @@ const ProductPickerModal: FC<Props> = ({
           onChange={(e) => setSearch(e.target.value)}
         />
         {loading ? (
-          <LoadingOutlined />
+          <div
+            style={{ display: "flex", padding: 20, justifyContent: "center" }}
+          >
+            <LoadingOutlined style={{ fontSize: 50, color: "#008060" }} />
+          </div>
         ) : (
           <div className="productsTree">
             {treeData && treeData?.length > 0 ? (
