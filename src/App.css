@@ -19,9 +19,7 @@ td.ant-table-cell.sortKey {
 .ant-table-wrapper .ant-table-tbody > tr > td {
   border-bottom: none;
 }
-.ant-table-wrapper .ant-table-tbody > tr > td {
-  padding: 10px 0px;
-}
+
 body {
   background-color: #e5e5e5;
 }
