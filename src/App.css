@@ -12,3 +12,13 @@
 .ant-tree .ant-tree-checkbox {
   align-self: center;
 }
+
+td.ant-table-cell.sortKey {
+  display: flex;
+}
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  border-bottom: none;
+}
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  padding: 10px 0px;
+}

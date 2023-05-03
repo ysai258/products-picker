@@ -8,7 +8,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Table } from "antd";
-import type { ColumnsType } from "antd/es/table";
+import type { ColumnsType, TableProps } from "antd/es/table";
 import React, { FC } from "react";
 
 interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> {
@@ -48,6 +48,7 @@ const Row = ({ children, ...props }: RowProps) => {
                 style={{
                   touchAction: "none",
                   cursor: isDragging ? "grabbing" : "grab",
+                  padding: 10,
                 }}
                 {...listeners}
               >
@@ -65,13 +66,18 @@ const Row = ({ children, ...props }: RowProps) => {
   );
 };
 
-interface Props<T> {
+interface Props<T> extends TableProps<T> {
   columns: ColumnsType<T>;
   dataSource: T[];
   setDataSource: React.Dispatch<React.SetStateAction<T[]>>;
 }
 
-const DragTable: FC<Props<any>> = ({ columns, dataSource, setDataSource }) => {
+const DragTable: FC<Props<any>> = ({
+  columns,
+  dataSource,
+  setDataSource,
+  ...props
+}) => {
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     if (active.id !== over?.id) {
       setDataSource((previous) => {
@@ -98,6 +104,7 @@ const DragTable: FC<Props<any>> = ({ columns, dataSource, setDataSource }) => {
           columns={columns}
           dataSource={dataSource}
           pagination={false}
+          {...props}
         />
       </SortableContext>
     </DndContext>

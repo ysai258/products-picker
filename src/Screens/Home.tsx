@@ -61,8 +61,14 @@ const VaraintsTable: FC<VaraintsTableProps> = ({ record, setDataSource }) => {
               <div>
                 <DiscountInput
                   discount={discount}
-                  onValueChange={(val) => (variantRecord.discount.value = val)}
-                  onTypeChange={(type) => (variantRecord.discount.type = type)}
+                  onValueChange={(val) => {
+                    if (variantRecord.discount)
+                      variantRecord.discount.value = val;
+                  }}
+                  onTypeChange={(type) => {
+                    if (variantRecord.discount)
+                      variantRecord.discount.type = type;
+                  }}
                   valueStyle={{ borderRadius: 30 }}
                   typeStyle={{ borderRadius: 30 }}
                 />
@@ -115,11 +121,12 @@ const VaraintsTable: FC<VaraintsTableProps> = ({ record, setDataSource }) => {
   }, [data]);
 
   return (
-    <div>
+    <div style={{ display: "flex", justifyContent: "flex-end" }}>
       <DragTable
         columns={varaintColumn}
         dataSource={data}
         setDataSource={setData}
+        showHeader={false}
       />
     </div>
   );
@@ -137,7 +144,7 @@ const DiscountSection: FC<DiscountSectionProps> = ({
     if (record.discount) record.discount.value = value;
     record.variants.forEach((val) => {
       if (record.discount) {
-        val.discount.value = value;
+        val.discount = { ...record.discount };
       }
     });
   };
@@ -145,7 +152,7 @@ const DiscountSection: FC<DiscountSectionProps> = ({
     if (record.discount) record.discount.type = type;
     record.variants.forEach((val) => {
       if (record.discount) {
-        val.discount.type = type;
+        val.discount = { ...record.discount };
       }
     });
   };
@@ -241,13 +248,15 @@ const Home = () => {
   const columns: ColumnsType<Product> = [
     {
       key: "sort",
+      title: <div></div>,
+      className: "sortKey",
     },
     {
       title: "Product",
       dataIndex: "title",
       render(value, record, index) {
         return (
-          <div>
+          <div style={{ borderBottom: "1px solid #0000001A" }}>
             <div
               style={{
                 display: "flex",
@@ -300,7 +309,11 @@ const Home = () => {
       <div style={{ position: "relative" }}>
         {dataSource && dataSource.length > 0 ? (
           <div>
-            Add Products
+            <div
+              style={{ display: "flex", justifyContent: "center", margin: 20 }}
+            >
+              Add Products
+            </div>
             <DragTable
               columns={columns}
               dataSource={dataSource}
